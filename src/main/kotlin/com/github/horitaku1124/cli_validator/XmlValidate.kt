@@ -2,11 +2,13 @@ package com.github.horitaku1124.cli_validator
 
 import org.xml.sax.InputSource
 import java.io.File
+import java.lang.System.err
 import javax.xml.parsers.DocumentBuilderFactory
 
 
 fun main(args: Array<String>) {
   if (args.isEmpty()) {
+    err.println("No xml path")
     System.exit(1);
   }
   val path = args[0]
@@ -16,11 +18,13 @@ fun main(args: Array<String>) {
     var succeed = true
     for (child in files) {
       val xmlPath = child.absoluteFile.toPath().toString()
-      val result = xmlFileCanOpen(xmlPath)
-      if (!result) {
-        succeed = false
+      if (xmlPath.endsWith(".xml")) {
+        val result = xmlFileCanOpen(xmlPath)
+        if (!result) {
+          succeed = false
+        }
+        println(xmlPath + " " + (if (result) "OK" else "NG"))
       }
-      println(xmlPath + " " + (if (result) "OK" else "NG"))
     }
     System.exit(if (succeed) 0 else 1)
   }
