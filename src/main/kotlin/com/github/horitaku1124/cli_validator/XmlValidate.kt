@@ -13,7 +13,10 @@ fun main(args: Array<String>) {
   }
   val path = args[0]
   val parentDir = File(path)
-  if (parentDir.isDirectory) {
+  if (!parentDir.exists()) {
+    System.err.println("Parent directory doesn't exists")
+    System.exit(2)
+  } else if (parentDir.isDirectory) {
     val files = parentDir.listFiles()
     var succeed = true
     for (child in files) {
@@ -27,6 +30,9 @@ fun main(args: Array<String>) {
       }
     }
     System.exit(if (succeed) 0 else 1)
+  } else {
+    System.err.println("It is not directory")
+    System.exit(3)
   }
 }
 
