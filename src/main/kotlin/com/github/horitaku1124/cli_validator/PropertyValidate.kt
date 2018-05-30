@@ -18,13 +18,13 @@ fun main(args: Array<String>) {
     val files = parentDir.listFiles()
     var succeed = true
     for (child in files) {
-      val xmlPath = child.absoluteFile.toPath().toString()
-      if (xmlPath.endsWith(".properties")) {
-        val result = propertyFileCanOpen(xmlPath)
+      val filePath = child.absoluteFile.toPath().toString()
+      if (filePath.endsWith(".properties")) {
+        val result = propertyFileCanOpen(filePath)
         if (!result) {
           succeed = false
         }
-        println(xmlPath + " " + (if (result) "OK" else "NG"))
+        println(filePath + " " + (if (result) "OK" else "NG"))
       }
     }
     System.exit(if (succeed) 0 else 1)
