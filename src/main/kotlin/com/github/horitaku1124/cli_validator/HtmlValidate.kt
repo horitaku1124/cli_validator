@@ -1,8 +1,7 @@
 package com.github.horitaku1124.cli_validator
 
+import com.github.horitaku1124.cli_validator.model.HtmlTag
 import java.io.File
-import java.io.FileInputStream
-import java.util.*
 
 
 fun main(args: Array<String>) {
@@ -10,6 +9,7 @@ fun main(args: Array<String>) {
     System.err.println("No html path")
     System.exit(1);
   }
+  var a = HtmlValidator()
   val path = args[0]
   val parentDir = File(path)
   if (!parentDir.exists()) {
@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
     for (child in files) {
       val htmlPath = child.absoluteFile.toPath().toString()
       if (htmlPath.endsWith(".html")) {
-        val result = htmlFileCanOpen(htmlPath)
+        val result = a.htmlFileCanOpen(htmlPath)
         if (!result) {
           succeed = false
         }
@@ -35,39 +35,56 @@ fun main(args: Array<String>) {
   }
 }
 
-fun htmlFileCanOpen(filePath: String): Boolean {
-  try {
-    var html = File(filePath).readText()
+class HtmlValidator {
+  fun htmlFileCanOpen(filePath: String): Boolean {
+    try {
+      var html = File(filePath).readText()
 
-    parseHtml(html)
-    return true
-  } catch (e: Exception) {
-    e.printStackTrace()
-    return false
-  }
-}
-
-fun parseHtml(html: String) {
-  var i = 0;
-  var inTag = false
-  var insideTag = StringBuffer()
-  while (i < html.length) {
-    var c = html[i]
-
-    if (inTag) {
-      if (c == '>') {
-        inTag = false
-        println(insideTag.toString())
-      } else {
-        insideTag.append(c)
-      }
-
-    } else {
-      if (c == '<') {
-        inTag = true
-        insideTag = StringBuffer()
-      }
+      parseHtml(html)
+      return true
+    } catch (e: Exception) {
+      e.printStackTrace()
+      return false
     }
-    i++
+  }
+
+  fun parseHtml(html: String) {
+    var i = 0;
+    var inTag = false
+    var insideTag = StringBuffer()
+    var htmlList = arrayListOf<HtmlTag>()
+    while (i < html.length) {
+      var c = html[i]
+      if (inTag) {
+        if (c == '>') {
+          inTag = false
+          var isEmpty = false
+          var attr = insideTag.toString()
+          if (attr.indexOf("/") == 0) {
+            isEmpty = true
+            htmlList.add(HtmlTag(HtmlTag.TagType.Close, attr))
+          } else {
+            parseAttr(attr)
+            htmlList.add(HtmlTag(HtmlTag.TagType.Open, attr))
+//          println(insideTag.toString())
+          }
+        } else {
+          insideTag.append(c)
+        }
+      } else {
+        if (c == '<') {
+          inTag = true
+          insideTag = StringBuffer()
+        }
+      }
+      i++
+    }
+    for (tag in htmlList) {
+      println(tag)
+    }
+  }
+
+  fun parseAttr(attr: String) {
+
   }
 }
