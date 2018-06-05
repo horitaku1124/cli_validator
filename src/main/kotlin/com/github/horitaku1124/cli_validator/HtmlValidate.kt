@@ -58,20 +58,23 @@ class HtmlValidator {
       if (inTag) {
         if (c == '>') {
           inTag = false
-          var isEmpty = false
-          var attr = insideTag.toString()
-          if (attr.indexOf("/") == 0) {
-            isEmpty = true
-            attr = attr.substring(1)
-            htmlList.add(HtmlTag(HtmlTag.TagType.Close, attr))
+          var tagStr = insideTag.toString()
+          if (tagStr.indexOf("/") == 0) {
+            tagStr = tagStr.substring(1)
+            htmlList.add(HtmlTag(HtmlTag.TagType.Close, tagStr))
           } else {
-            parseAttr(attr)
-            var attributes = attr.split(" ")
-            var tag = attributes[0]
-            if (tag == "!DOCTYPE") {
+            parseAttr(tagStr)
+            var attributes = tagStr.split(" ")
+            var tagName = attributes[0]
+            if (tagName == "!DOCTYPE") {
               htmlList.add(HtmlTag(HtmlTag.TagType.DocType, attributes[1]))
             } else {
-              htmlList.add(HtmlTag(HtmlTag.TagType.Open, tag))
+              var attr:HashMap<String, String> = HashMap()
+              for (j in 1 until attributes.size) {
+                var attrPair = attributes[j].split("=")
+                attr.put(attrPair[0], attrPair[1])
+              }
+              htmlList.add(HtmlTag(HtmlTag.TagType.Open, tagName, attr))
             }
 //          println(insideTag.toString())
           }
@@ -81,7 +84,7 @@ class HtmlValidator {
         }
       } else {
         if (c == '<') {
-          if (insideTag.length > 0) {
+          if (insideTag.isNotEmpty()) {
             htmlList.add(HtmlTag(HtmlTag.TagType.Text, insideTag.toString()))
           }
           inTag = true
