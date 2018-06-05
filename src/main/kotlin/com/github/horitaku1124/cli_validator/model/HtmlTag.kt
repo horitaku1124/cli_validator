@@ -1,12 +1,13 @@
 package com.github.horitaku1124.cli_validator.model
 
 
-class HtmlTag(var type: TagType, var name: String) {
+class HtmlTag(var type: TagType, var name: String? = null) {
   enum class TagType {
-    Open, Close, Empty;
+    DocType, Text, Open, Close, Empty;
   };
 
   override fun toString():String {
-    return this.type.toString() + "\t" + name
+    var str = name ?: ""
+    return this.type.toString() + "\t" + (str.replace("\n", "\\n"))
   }
 }

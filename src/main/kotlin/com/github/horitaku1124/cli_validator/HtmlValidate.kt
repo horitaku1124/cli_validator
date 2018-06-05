@@ -48,7 +48,7 @@ class HtmlValidator {
     }
   }
 
-  fun parseHtml(html: String) {
+  fun parseHtml(html: String): ArrayList<HtmlTag> {
     var i = 0;
     var inTag = false
     var insideTag = StringBuffer()
@@ -62,19 +62,32 @@ class HtmlValidator {
           var attr = insideTag.toString()
           if (attr.indexOf("/") == 0) {
             isEmpty = true
+            attr = attr.substring(1)
             htmlList.add(HtmlTag(HtmlTag.TagType.Close, attr))
           } else {
             parseAttr(attr)
-            htmlList.add(HtmlTag(HtmlTag.TagType.Open, attr))
+            var attributes = attr.split(" ")
+            var tag = attributes[0]
+            if (tag == "!DOCTYPE") {
+              htmlList.add(HtmlTag(HtmlTag.TagType.DocType, attributes[1]))
+            } else {
+              htmlList.add(HtmlTag(HtmlTag.TagType.Open, tag))
+            }
 //          println(insideTag.toString())
           }
+          insideTag = StringBuffer()
         } else {
           insideTag.append(c)
         }
       } else {
         if (c == '<') {
+          if (insideTag.length > 0) {
+            htmlList.add(HtmlTag(HtmlTag.TagType.Text, insideTag.toString()))
+          }
           inTag = true
           insideTag = StringBuffer()
+        } else {
+          insideTag.append(c)
         }
       }
       i++
@@ -82,6 +95,7 @@ class HtmlValidator {
     for (tag in htmlList) {
       println(tag)
     }
+    return htmlList
   }
 
   fun parseAttr(attr: String) {
