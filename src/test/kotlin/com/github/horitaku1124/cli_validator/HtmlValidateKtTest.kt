@@ -1,11 +1,10 @@
 package com.github.horitaku1124.cli_validator
 
-import com.github.horitaku1124.cli_validator.HtmlValidator
 import com.github.horitaku1124.cli_validator.model.HtmlTag
-import org.hamcrest.CoreMatchers.`is` as Is
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
+import org.hamcrest.CoreMatchers.`is` as Is
 
 class HtmlValidateKtTest {
   var html1 = """<!DOCTYPE html>
@@ -18,10 +17,24 @@ class HtmlValidateKtTest {
 This is main content
 </body>
 </html>"""
+  var html2 = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Test HTML</title>
+  <!--[if lt IE 9]>
+    <script src="/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+This is main content
+</body>
+</html>"""
+
   var hv = HtmlValidator()
   @Before
   fun setup() {
-
+    System.out.println(" -- setup --")
   }
 
   @Test
@@ -38,9 +51,9 @@ This is main content
     var htmlList = hv.parseHtml(html1)
     assertThat(htmlList.size, Is(19))
   }
-
   @Test
-  fun parseAttr() {
+  fun parseHtml3() {
+    var htmlList = hv.parseHtml(html2)
+    assertThat(htmlList.size, Is(20))
   }
-
 }

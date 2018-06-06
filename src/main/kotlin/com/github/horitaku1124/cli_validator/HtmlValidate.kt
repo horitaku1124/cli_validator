@@ -34,7 +34,7 @@ fun main(args: Array<String>) {
         if (!result) {
           succeed = false
         }
-        val filePath = if ( htmlPath.indexOf(path) == 0 ) htmlPath.replace(path, "") else htmlPath
+        val filePath = if (htmlPath.indexOf(path) == 0 ) htmlPath.replace(path, "") else htmlPath
         println(filePath + " " + (if (result) "OK" else "NG"))
       }
     }
@@ -61,11 +61,19 @@ class HtmlValidator {
   fun parseHtml(html: String): ArrayList<HtmlTag> {
     var i = 0;
     var inTag = false
+    var inComment = false
     var insideTag = StringBuffer()
     var htmlList = arrayListOf<HtmlTag>()
     while (i < html.length) {
       var c = html[i]
-      if (inTag) {
+      if (inComment) {
+        if (c == '-') {
+          if (html[i + 1] == '-' && html[i + 2] == '>') {
+            inComment = false
+            i += 2
+          }
+        }
+      } else if (inTag) {
         if (c == '>') {
           inTag = false
           var tagStr = insideTag.toString()
@@ -82,7 +90,9 @@ class HtmlValidator {
               var attr:HashMap<String, String> = HashMap()
               for (j in 1 until attributes.size) {
                 var attrPair = attributes[j].split("=")
-                attr.put(attrPair[0], attrPair[1])
+                if (attrPair.size == 2) {
+                  attr.put(attrPair[0], attrPair[1])
+                }
               }
               htmlList.add(HtmlTag(HtmlTag.TagType.Open, tagName, attr))
             }
@@ -97,8 +107,14 @@ class HtmlValidator {
           if (insideTag.isNotEmpty()) {
             htmlList.add(HtmlTag(HtmlTag.TagType.Text, insideTag.toString()))
           }
-          inTag = true
+          if (html[i + 1] == '!' && html[i + 2] == '-' && html[i + 2] == '-') {
+            i += 2
+            inComment = true
+          } else {
+            inTag = true
+          }
           insideTag = StringBuffer()
+
         } else {
           insideTag.append(c)
         }
