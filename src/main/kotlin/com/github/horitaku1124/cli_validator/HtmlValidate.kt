@@ -9,23 +9,33 @@ fun main(args: Array<String>) {
     System.err.println("No html path")
     System.exit(1);
   }
-  var a = HtmlValidator()
+  val htmlValidator = HtmlValidator()
   val path = args[0]
   val parentDir = File(path)
   if (!parentDir.exists()) {
     System.err.println("Parent directory doesn't exists")
     System.exit(2)
+  } else if (parentDir.isFile) {
+    var result = false;
+    val htmlPath = parentDir.toString()
+    if (htmlPath.endsWith(".html")) {
+      result = htmlValidator.htmlFileCanOpen(htmlPath)
+
+      println(path + " " + (if (result) "OK" else "NG"))
+    }
+    System.exit(if (result) 0 else 1)
   } else if (parentDir.isDirectory) {
     val files = parentDir.listFiles()
     var succeed = true
     for (child in files) {
       val htmlPath = child.absoluteFile.toPath().toString()
       if (htmlPath.endsWith(".html")) {
-        val result = a.htmlFileCanOpen(htmlPath)
+        val result = htmlValidator.htmlFileCanOpen(htmlPath)
         if (!result) {
           succeed = false
         }
-        println(htmlPath + " " + (if (result) "OK" else "NG"))
+        val filePath = if ( htmlPath.indexOf(path) == 0 ) htmlPath.replace(path, "") else htmlPath
+        println(filePath + " " + (if (result) "OK" else "NG"))
       }
     }
     System.exit(if (succeed) 0 else 1)
