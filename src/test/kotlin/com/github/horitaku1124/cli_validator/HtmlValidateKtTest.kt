@@ -56,4 +56,10 @@ This is main content
     var htmlList = hv.parseHtml(html2)
     assertThat(htmlList.size, Is(20))
   }
+
+  @Test
+  fun parseHtml4() {
+    var htmlList = hv.parseHtml("<a class='c1 c2 ' href='/' \n  width='100' \n  height='200'>")
+    assertThat(htmlList.size, Is(1))
+  }
 }

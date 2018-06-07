@@ -81,22 +81,9 @@ class HtmlValidator {
             tagStr = tagStr.substring(1)
             htmlList.add(HtmlTag(HtmlTag.TagType.Close, tagStr))
           } else {
-            parseAttr(tagStr)
-            var attributes = tagStr.split(" ")
-            var tagName = attributes[0]
-            if (tagName == "!DOCTYPE") {
-              htmlList.add(HtmlTag(HtmlTag.TagType.DocType, attributes[1]))
-            } else {
-              var attr:HashMap<String, String> = HashMap()
-              for (j in 1 until attributes.size) {
-                var attrPair = attributes[j].split("=")
-                if (attrPair.size == 2) {
-                  attr.put(attrPair[0], attrPair[1])
-                }
-              }
-              htmlList.add(HtmlTag(HtmlTag.TagType.Open, tagName, attr))
-            }
-//          println(insideTag.toString())
+            var newTag = parseAttr(tagStr)
+
+            htmlList.add(newTag)
           }
           insideTag = StringBuffer()
         } else {
@@ -127,7 +114,65 @@ class HtmlValidator {
     return htmlList
   }
 
-  fun parseAttr(attr: String) {
+  fun parseAttr(tagStr: String): HtmlTag{
+    var strBuf = StringBuffer()
+    var tokens = arrayListOf<String>()
+    var inSingleQuote = false
+    var inDoubleQuote = false
+    var i = 0
+    while (i < tagStr.length) {
+      var c = tagStr[i]
+      if (inSingleQuote) {
+        if (c == '\'') {
+          inSingleQuote = false
+          strBuf.append(c)
+          tokens.add(strBuf.toString())
+          strBuf = StringBuffer()
+        } else {
+          strBuf.append(c)
+        }
+      } else if (inDoubleQuote) {
+        if (c == '"') {
+          inDoubleQuote = false
+          strBuf.append(c)
+          tokens.add(strBuf.toString())
+          strBuf = StringBuffer()
+        } else {
+          strBuf.append(c)
+        }
+      } else if (c == '=') {
+         strBuf.append(c)
+        if (tagStr[i + 1] == '\'') {
+          inSingleQuote = true
+          i++
+          strBuf.append(tagStr[i])
+        }
+        if (tagStr[i + 1] == '"') {
+          inDoubleQuote = true
+          i++
+          strBuf.append(tagStr[i])
+        }
+      } else if (c == ' ' || c == '\t' || c == '\n') {
+        if (strBuf.length > 0) {
+          tokens.add(strBuf.toString())
+          strBuf = StringBuffer()
+        }
+      } else {
+        strBuf.append(c)
+      }
+      i++
+    }
+    if (strBuf.length > 0) {
+      tokens.add(strBuf.toString())
+    }
 
+    var attributes = HashMap<String, String>()
+    for (j in 1 until tokens.size) {
+      var pair = tokens[j].split("=")
+      if (pair.size > 1) {
+        attributes.put(pair[0], pair[1])
+      }
+    }
+    return HtmlTag(HtmlTag.TagType.Open, tokens[0], attributes)
   }
 }
