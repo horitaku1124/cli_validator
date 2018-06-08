@@ -3,6 +3,14 @@ package com.github.horitaku1124.cli_validator
 import com.github.horitaku1124.cli_validator.model.HtmlTag
 import java.io.File
 
+var obsoleteTags = listOf(
+        "acronym", "applet", "basefont", "big", "center", "dir", "font", "frame", "frameset",
+        "isindex", "noframes", "s", "strike", "tt", "u"
+)
+var obsoleteAttributes: Map<String, List<String>> = hashMapOf(
+        "a" to listOf("rev", "charset"),
+        "table" to listOf("align", "bgcolor", "border", "cellpadding")
+)
 
 fun main(args: Array<String>) {
   if (args.isEmpty()) {
@@ -49,8 +57,25 @@ class HtmlValidator {
   fun htmlFileCanOpen(filePath: String): Boolean {
     try {
       var html = File(filePath).readText()
-
-      parseHtml(html)
+      var htmlList = parseHtml(html)
+      for (tag in htmlList) {
+        if (tag.type == HtmlTag.TagType.Open) {
+          var name = tag.name;
+          if (obsoleteTags.contains(name)) {
+            println("Obsolete tag: " + name)
+          } else if (obsoleteAttributes.containsKey(name)) {
+            var attr = tag.attr
+            var candidates = obsoleteAttributes[name]
+            if (attr != null && candidates != null) {
+              for (set in attr.entries) {
+                if (candidates.contains(set.key)) {
+                  println("Obsolete attr: " + set.key + " in " + name)
+                }
+              }
+            }
+          }
+        }
+      }
       return true
     } catch (e: Exception) {
       e.printStackTrace()
@@ -81,9 +106,7 @@ class HtmlValidator {
             tagStr = tagStr.substring(1)
             htmlList.add(HtmlTag(HtmlTag.TagType.Close, tagStr))
           } else {
-            var newTag = parseAttr(tagStr)
-
-            htmlList.add(newTag)
+            htmlList.add(parseAttr(tagStr))
           }
           insideTag = StringBuffer()
         } else {
@@ -107,9 +130,6 @@ class HtmlValidator {
         }
       }
       i++
-    }
-    for (tag in htmlList) {
-      println(tag)
     }
     return htmlList
   }
