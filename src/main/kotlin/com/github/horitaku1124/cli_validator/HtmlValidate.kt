@@ -8,8 +8,37 @@ var obsoleteTags = listOf(
         "isindex", "noframes", "s", "strike", "tt", "u"
 )
 var obsoleteAttributes: Map<String, List<String>> = hashMapOf(
-        "a" to listOf("rev", "charset"),
-        "table" to listOf("align", "bgcolor", "border", "cellpadding")
+        "a" to listOf("rev", "charset", "shape", "coords"),
+        "link" to listOf("rev", "charset", "target"),
+        "img" to listOf("longdesc", "name", "align", "hspace", "vspace"),
+        "iframe" to listOf("longdesc", "name", "align", "frameborder", "marginheight", "marginwidth", "scrolling"),
+        "head" to listOf("profile"),
+        "html" to listOf("version"),
+        "area" to listOf("nohref"),
+        "meta" to listOf("scheme"),
+        "object" to listOf("archive", "classid", "codebase", "codetype", "declare", "standby"),
+        "td" to listOf("axis", "abbr", "scope", "align", "bgcolor", "char", "charoff", "nowrap", "width"),
+        "th" to listOf("bgcolor", "char", "charoff", "nowrap", "width"),
+        "br" to listOf("clear"),
+        "body" to listOf("alink", "link", "vlink", "text", "background", "bgcolor"),
+        "caption" to listOf("align"),
+        "input" to listOf("align"),
+        "legend" to listOf("align"),
+        "hr" to listOf("align"),
+        "div" to listOf("align"),
+        "h1" to listOf("align"),
+        "h2" to listOf("align"),
+        "h3" to listOf("align"),
+        "h4" to listOf("align"),
+        "h5" to listOf("align"),
+        "h6" to listOf("align"),
+        "p" to listOf("align"),
+        "col" to listOf("align"),
+        "colgroup" to listOf("align"),
+        "tfoot" to listOf("align"),
+        "thead" to listOf("align"),
+        "tr" to listOf("align"),
+        "table" to listOf("align", "bgcolor", "border", "cellpadding", "cellspacing", "frame", "width")
 )
 
 fun searchDirectory(parentDir:File, found:ArrayList<File>) {
