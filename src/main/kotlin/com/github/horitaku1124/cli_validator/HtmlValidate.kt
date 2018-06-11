@@ -12,6 +12,17 @@ var obsoleteAttributes: Map<String, List<String>> = hashMapOf(
         "table" to listOf("align", "bgcolor", "border", "cellpadding")
 )
 
+fun searchDirectory(parentDir:File, found:ArrayList<File>) {
+  if (parentDir.isDirectory) {
+    var children = parentDir.listFiles()
+    for (child in children) {
+      searchDirectory(child, found)
+    }
+  } else {
+    found.add(parentDir)
+  }
+}
+
 fun main(args: Array<String>) {
   if (args.isEmpty()) {
     System.err.println("No html path")
@@ -27,22 +38,25 @@ fun main(args: Array<String>) {
     var result = false;
     val htmlPath = parentDir.toString()
     if (htmlPath.endsWith(".html")) {
-      result = htmlValidator.htmlFileCanOpen(htmlPath)
+      result = htmlValidator.checkHtmlFile(htmlPath)
 
       println(path + " " + (if (result) "OK" else "NG"))
     }
     System.exit(if (result) 0 else 1)
   } else if (parentDir.isDirectory) {
-    val files = parentDir.listFiles()
+    var targetCanonicalPath = parentDir.canonicalPath
+    var htmlFiles = arrayListOf<File>()
+    searchDirectory(parentDir, htmlFiles)
     var succeed = true
-    for (child in files) {
-      val htmlPath = child.absoluteFile.toPath().toString()
+    for (child in htmlFiles) {
+      val htmlPath = child.canonicalPath
       if (htmlPath.endsWith(".html")) {
-        val result = htmlValidator.htmlFileCanOpen(htmlPath)
+        val result = htmlValidator.checkHtmlFile(htmlPath)
         if (!result) {
           succeed = false
         }
-        val filePath = if (htmlPath.indexOf(path) == 0 ) htmlPath.replace(path, "") else htmlPath
+        val filePath = if (htmlPath.indexOf(targetCanonicalPath) == 0 )
+          htmlPath.replace(targetCanonicalPath, "") else htmlPath
         println(filePath + " " + (if (result) "OK" else "NG"))
       }
     }
@@ -54,7 +68,7 @@ fun main(args: Array<String>) {
 }
 
 class HtmlValidator {
-  fun htmlFileCanOpen(filePath: String): Boolean {
+  fun checkHtmlFile(filePath: String): Boolean {
     try {
       var html = File(filePath).readText()
       var htmlList = parseHtml(html)
