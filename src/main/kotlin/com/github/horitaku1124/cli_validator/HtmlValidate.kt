@@ -73,7 +73,7 @@ fun main(args: Array<String>) {
 
       println(path + " " + (if (result) "OK" else "NG"))
       for (warn in message.warnList) {
-        println(" W - " + warn)
+        println(" W - $warn")
       }
     }
     System.exit(if (result) 0 else 1)
@@ -100,7 +100,7 @@ fun main(args: Array<String>) {
         println(filePath + " " + (if (result) "OK" else "NG"))
         if (message != null) {
           for (warn in message.warnList) {
-            println(" W - " + warn)
+            println(" W - $warn")
           }
         }
       }
@@ -120,7 +120,7 @@ class HtmlValidator {
       if (tag.type == HtmlTag.TagType.Open) {
         var name = tag.name;
         if (obsoleteTags.contains(name)) {
-          resultMessage.warnList.add("Obsolete tag: " + name)
+          resultMessage.warnList.add("Obsolete tag: $name")
         } else if (obsoleteAttributes.containsKey(name)) {
           var attr = tag.attr
           var candidates = obsoleteAttributes[name]
