@@ -1,6 +1,7 @@
 package com.github.horitaku1124.cli_validator
 
 import com.github.horitaku1124.cli_validator.model.HtmlTag
+import com.github.horitaku1124.cli_validator.model.Message
 import java.io.File
 
 var obsoleteTags = listOf(
@@ -67,9 +68,13 @@ fun main(args: Array<String>) {
     var result = false;
     val htmlPath = parentDir.toString()
     if (htmlPath.endsWith(".html")) {
-      result = htmlValidator.checkHtmlFile(htmlPath)
+      var html = File(htmlPath).readText()
+      var message = htmlValidator.checkHtmlFile(html)
 
       println(path + " " + (if (result) "OK" else "NG"))
+      for (warn in message.warnList) {
+        println(" W - " + warn)
+      }
     }
     System.exit(if (result) 0 else 1)
   } else if (parentDir.isDirectory) {
@@ -80,13 +85,24 @@ fun main(args: Array<String>) {
     for (child in htmlFiles) {
       val htmlPath = child.canonicalPath
       if (htmlPath.endsWith(".html")) {
-        val result = htmlValidator.checkHtmlFile(htmlPath)
-        if (!result) {
-          succeed = false
+        var result = true
+        var message: Message? = null
+        try {
+          var html = File(htmlPath).readText()
+          message = htmlValidator.checkHtmlFile(html)
+        } catch (e: Exception) {
+          e.printStackTrace()
+          result = false
         }
+
         val filePath = if (htmlPath.indexOf(targetCanonicalPath) == 0 )
           htmlPath.replace(targetCanonicalPath, "") else htmlPath
         println(filePath + " " + (if (result) "OK" else "NG"))
+        if (message != null) {
+          for (warn in message.warnList) {
+            println(" W - " + warn)
+          }
+        }
       }
     }
     System.exit(if (succeed) 0 else 1)
@@ -97,33 +113,28 @@ fun main(args: Array<String>) {
 }
 
 class HtmlValidator {
-  fun checkHtmlFile(filePath: String): Boolean {
-    try {
-      var html = File(filePath).readText()
-      var htmlList = parseHtml(html)
-      for (tag in htmlList) {
-        if (tag.type == HtmlTag.TagType.Open) {
-          var name = tag.name;
-          if (obsoleteTags.contains(name)) {
-            println("Obsolete tag: " + name)
-          } else if (obsoleteAttributes.containsKey(name)) {
-            var attr = tag.attr
-            var candidates = obsoleteAttributes[name]
-            if (attr != null && candidates != null) {
-              for (set in attr.entries) {
-                if (candidates.contains(set.key)) {
-                  println("Obsolete attr: " + set.key + " in " + name)
-                }
+  fun checkHtmlFile(html: String): Message {
+    var resultMessage = Message()
+    var htmlList = parseHtml(html)
+    for (tag in htmlList) {
+      if (tag.type == HtmlTag.TagType.Open) {
+        var name = tag.name;
+        if (obsoleteTags.contains(name)) {
+          resultMessage.warnList.add("Obsolete tag: " + name)
+        } else if (obsoleteAttributes.containsKey(name)) {
+          var attr = tag.attr
+          var candidates = obsoleteAttributes[name]
+          if (attr != null && candidates != null) {
+            for (set in attr.entries) {
+              if (candidates.contains(set.key)) {
+                resultMessage.warnList.add("Obsolete attr: " + set.key + " in " + name)
               }
             }
           }
         }
       }
-      return true
-    } catch (e: Exception) {
-      e.printStackTrace()
-      return false
     }
+    return resultMessage
   }
 
   fun parseHtml(html: String): ArrayList<HtmlTag> {
