@@ -1,8 +1,10 @@
 package com.github.horitaku1124.cli_validator
 
+import com.github.horitaku1124.cli_validator.model.HtmlNode
 import com.github.horitaku1124.cli_validator.model.HtmlTag
 import com.github.horitaku1124.cli_validator.model.Message
 import java.io.File
+import java.util.*
 
 var obsoleteTags = listOf(
         "acronym", "applet", "basefont", "big", "center", "dir", "font", "frame", "frameset",
@@ -65,15 +67,24 @@ fun main(args: Array<String>) {
     System.err.println("Parent directory doesn't exists")
     System.exit(2)
   } else if (parentDir.isFile) {
-    var result = false;
+    var result = true;
+    var message: Message? = null
     val htmlPath = parentDir.toString()
     if (htmlPath.endsWith(".html")) {
-      var html = File(htmlPath).readText()
-      var message = htmlValidator.checkHtmlFile(html)
+
+      try {
+        var html = File(htmlPath).readText()
+        message = htmlValidator.checkHtmlFile(html)
+      } catch (e: Exception) {
+        e.printStackTrace()
+        result = false
+      }
 
       println(path + " " + (if (result) "OK" else "NG"))
-      for (warn in message.warnList) {
-        println(" W - $warn")
+      if (message != null) {
+        for (warn in message.warnList) {
+          println(" W - $warn")
+        }
       }
     }
     System.exit(if (result) 0 else 1)
@@ -134,7 +145,35 @@ class HtmlValidator {
         }
       }
     }
+    var nodeList = extractTree(htmlList)
     return resultMessage
+  }
+
+  private fun extractTree(htmlList: ArrayList<HtmlTag>): HtmlNode {
+    var rootNode = HtmlNode("root", HtmlNode.NodeType.Root)
+
+    var depth = Stack<HtmlNode>()
+    depth.push(rootNode)
+
+    var current = rootNode
+    for (tag in htmlList) {
+      if (tag.type == HtmlTag.TagType.Open) {
+        var node = HtmlNode(tag)
+        current.appendChild(node)
+        depth.push(node)
+        current = node
+      } else if (tag.type == HtmlTag.TagType.Close) {
+        depth.pop()
+        current = depth.get(depth.size - 1)
+//        rootNode.appendChild(node)
+      } else if (tag.type == HtmlTag.TagType.Text) {
+        var textNode = HtmlNode.createTextNode(tag.name!!)
+        textNode.innerId = tag.innerId
+        current.appendChild(textNode)
+      }
+
+    }
+    return rootNode
   }
 
   fun parseHtml(html: String): ArrayList<HtmlTag> {
@@ -156,12 +195,16 @@ class HtmlValidator {
         if (c == '>') {
           inTag = false
           var tagStr = insideTag.toString()
+          var newTag: HtmlTag
           if (tagStr.indexOf("/") == 0) {
             tagStr = tagStr.substring(1)
-            htmlList.add(HtmlTag(HtmlTag.TagType.Close, tagStr))
+            newTag = HtmlTag(HtmlTag.TagType.Close, tagStr)
           } else {
-            htmlList.add(parseAttr(tagStr))
+            newTag = parseAttr(tagStr)
           }
+          newTag.innerId = htmlList.size + 1
+          htmlList.add(newTag)
+
           insideTag = StringBuffer()
         } else {
           insideTag.append(c)
@@ -169,7 +212,9 @@ class HtmlValidator {
       } else {
         if (c == '<') {
           if (insideTag.isNotEmpty()) {
-            htmlList.add(HtmlTag(HtmlTag.TagType.Text, insideTag.toString()))
+            var newTag = HtmlTag(HtmlTag.TagType.Text, insideTag.toString())
+            newTag.innerId = htmlList.size + 1
+            htmlList.add(newTag)
           }
           if (html[i + 1] == '!' && html[i + 2] == '-' && html[i + 2] == '-') {
             i += 2

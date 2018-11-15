@@ -4,7 +4,9 @@ package com.github.horitaku1124.cli_validator.model
 class HtmlTag(var type: TagType, var name: String? = null, var attr: HashMap<String, String>? = null) {
   enum class TagType {
     DocType, Text, Open, Close, Empty;
-  };
+  }
+
+  var innerId: Int? = null
 
   override fun toString():String {
     var str = name ?: ""
