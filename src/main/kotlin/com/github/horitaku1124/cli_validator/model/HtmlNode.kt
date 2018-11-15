@@ -3,6 +3,7 @@ package com.github.horitaku1124.cli_validator.model
 class HtmlNode() {
     lateinit var name: String
     lateinit var type: NodeType
+    var attr = mapOf<String, String>()
     var innerText: String? = null
     var children = arrayListOf<HtmlNode>()
     var innerId: Int? = null
@@ -22,6 +23,7 @@ class HtmlNode() {
         name = tag.name!!
         type = NodeType.TagNode
         innerId = tag.innerId
+        attr = tag.attr!!
     }
 
     fun appendChild(child: HtmlNode) {

@@ -158,10 +158,15 @@ class HtmlValidator {
     var current = rootNode
     for (tag in htmlList) {
       if (tag.type == HtmlTag.TagType.Open) {
-        var node = HtmlNode(tag)
-        current.appendChild(node)
-        depth.push(node)
-        current = node
+        if (tag.name == "meta") {
+          var node = HtmlNode(tag)
+          current.appendChild(node)
+        } else {
+          var node = HtmlNode(tag)
+          current.appendChild(node)
+          depth.push(node)
+          current = node
+        }
       } else if (tag.type == HtmlTag.TagType.Close) {
         depth.pop()
         current = depth.get(depth.size - 1)
