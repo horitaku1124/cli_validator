@@ -149,7 +149,27 @@ class HtmlValidator {
     return resultMessage
   }
 
-  private fun extractTree(htmlList: ArrayList<HtmlTag>): HtmlNode {
+  fun removeScriptTag(html: String): String {
+    val leftMath = "<script"
+    val rightMath = "</script>"
+    var retHtml = html
+    while(true) {
+      var index = retHtml.indexOf(leftMath)
+      if (index < 0) {
+        break
+      }
+      var indexEnd = retHtml.indexOf(rightMath)
+      if (indexEnd < 0) {
+        break
+      }
+      var left = retHtml.substring(0, index)
+      var right = retHtml.substring(indexEnd + rightMath.length, retHtml.length)
+      retHtml = left + right
+    }
+    return retHtml
+  }
+
+  fun extractTree(htmlList: ArrayList<HtmlTag>): HtmlNode {
     var rootNode = HtmlNode("root", HtmlNode.NodeType.Root)
 
     var depth = Stack<HtmlNode>()
@@ -158,7 +178,8 @@ class HtmlValidator {
     var current = rootNode
     for (tag in htmlList) {
       if (tag.type == HtmlTag.TagType.Open) {
-        if (tag.name == "meta") {
+        if (tag.name == "meta" || tag.name == "link") {
+          tag.type = HtmlTag.TagType.Empty
           var node = HtmlNode(tag)
           current.appendChild(node)
         } else {
