@@ -1,5 +1,6 @@
 package com.github.horitaku1124.cli_validator
 
+import com.github.horitaku1124.cli_validator.logic.HtmlParser
 import com.github.horitaku1124.cli_validator.model.HtmlTag
 import org.junit.Assert.assertThat
 import org.junit.Before
@@ -30,8 +31,18 @@ This is main content
 This is main content
 </body>
 </html>"""
+  var html3 = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Test HTML3</title>
+</head>
+<body>
+<p><img src="1.jpg" /></p>
+<p><img src="2.jpg" ></p>
+</body>
+</html>"""
 
-  var hv = HtmlValidator()
+  var hv = HtmlParser()
   @Before
   fun setup() {
     System.out.println(" -- setup --")
@@ -61,5 +72,11 @@ This is main content
   fun parseHtml4() {
     var htmlList = hv.parseHtml("<a class='c1 c2 ' href='/' \n  width='100' \n  height='200'>")
     assertThat(htmlList.size, Is(1))
+  }
+
+  @Test
+  fun parseHtml5() {
+    var htmlList = hv.parseHtml(html3)
+    assertThat(htmlList.size, Is(19))
   }
 }
