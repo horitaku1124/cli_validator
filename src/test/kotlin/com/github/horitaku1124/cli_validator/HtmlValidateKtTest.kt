@@ -77,6 +77,10 @@ This is main content
   @Test
   fun parseHtml5() {
     var htmlList = hv.parseHtml(html3)
-    assertThat(htmlList.size, Is(19))
+    assertThat(htmlList.get(15).name, Is("img"))
+    assertThat(htmlList.get(15).type, Is(HtmlTag.TagType.Empty))
+    assertThat(htmlList.get(19).name, Is("img"))
+    assertThat(htmlList.get(19).type, Is(HtmlTag.TagType.Open))
+    assertThat(htmlList.size, Is(25))
   }
 }

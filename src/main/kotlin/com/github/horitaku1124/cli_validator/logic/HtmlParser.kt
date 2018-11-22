@@ -51,7 +51,7 @@ class HtmlParser {
             newTag = HtmlTag(HtmlTag.TagType.Close, tagStr)
           } else if (tagStr.lastIndexOf("/") == tagStr.length - 1) {
             tagStr = tagStr.substring(0, tagStr.length - 1)
-            newTag = HtmlTag(HtmlTag.TagType.Empty, tagStr)
+            newTag = parseAttr(tagStr, HtmlTag.TagType.Empty)
           } else {
             newTag = parseAttr(tagStr)
           }
@@ -86,7 +86,7 @@ class HtmlParser {
     return htmlList
   }
 
-  fun parseAttr(tagStr: String): HtmlTag {
+  fun parseAttr(tagStr: String, tagType: HtmlTag.TagType = HtmlTag.TagType.Open): HtmlTag {
     var strBuf = StringBuffer()
     var tokens = arrayListOf<String>()
     var inSingleQuote = false
@@ -145,7 +145,7 @@ class HtmlParser {
         attributes.put(pair[0], pair[1])
       }
     }
-    return HtmlTag(HtmlTag.TagType.Open, tokens[0], attributes)
+    return HtmlTag(tagType, tokens[0], attributes)
   }
 
   fun extractTree(htmlList: ArrayList<HtmlTag>): HtmlNode {
