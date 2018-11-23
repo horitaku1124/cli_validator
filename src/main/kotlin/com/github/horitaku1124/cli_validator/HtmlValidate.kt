@@ -1,7 +1,6 @@
 package com.github.horitaku1124.cli_validator
 
 import com.github.horitaku1124.cli_validator.logic.HtmlParser
-import com.github.horitaku1124.cli_validator.model.HtmlNode
 import com.github.horitaku1124.cli_validator.model.HtmlTag
 import com.github.horitaku1124.cli_validator.model.Message
 import java.io.File

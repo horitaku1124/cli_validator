@@ -2,6 +2,7 @@ package com.github.horitaku1124.cli_validator
 
 import com.github.horitaku1124.cli_validator.logic.HtmlParser
 import com.github.horitaku1124.cli_validator.model.HtmlTag
+import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -57,6 +58,7 @@ This is main content
     assertThat(htmlList[1].type, Is(HtmlTag.TagType.Close))
     assertThat(htmlList[1].name, Is("html"))
   }
+
   @Test
   fun parseHtml2() {
     var htmlList = hv.parseHtml(html1)
@@ -64,18 +66,25 @@ This is main content
   }
   @Test
   fun parseHtml3() {
+    var htmlList = hv.parseHtml(html1)
+    var nodeTree = hv.extractTree(htmlList)
+    var texts = hv.allTextFromTree(nodeTree)
+    assertThat(texts, containsString("This is main content"))
+  }
+  @Test
+  fun parseHtml4() {
     var htmlList = hv.parseHtml(html2)
     assertThat(htmlList.size, Is(20))
   }
 
   @Test
-  fun parseHtml4() {
+  fun parseHtml5() {
     var htmlList = hv.parseHtml("<a class='c1 c2 ' href='/' \n  width='100' \n  height='200'>")
     assertThat(htmlList.size, Is(1))
   }
 
   @Test
-  fun parseHtml5() {
+  fun parseHtml6() {
     var htmlList = hv.parseHtml(html3)
     assertThat(htmlList.get(15).name, Is("img"))
     assertThat(htmlList.get(15).type, Is(HtmlTag.TagType.Empty))

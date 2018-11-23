@@ -187,4 +187,19 @@ class HtmlParser {
     }
     return rootNode
   }
+
+  private fun dig(node:HtmlNode, b:StringBuffer) {
+    if (node.type == HtmlNode.NodeType.Text) {
+      b.append(node.innerText)
+    }
+    for (child in node.children) {
+      dig(child, b)
+    }
+  }
+
+  fun allTextFromTree(nodeTree: HtmlNode): String {
+    var buffer = StringBuffer()
+    dig(nodeTree, buffer)
+    return buffer.toString()
+  }
 }
