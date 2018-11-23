@@ -6,6 +6,7 @@ import java.util.*
 
 
 class HtmlParser {
+  var EmptyTags = listOf("meta", "link", "img")
   fun removeScriptTag(html: String): String {
     val leftMath = "<script"
     val rightMath = "</script>"
@@ -157,7 +158,7 @@ class HtmlParser {
     var current = rootNode
     for (tag in htmlList) {
       if (tag.type == HtmlTag.TagType.Open) {
-        if (tag.name == "meta" || tag.name == "link") {
+        if (EmptyTags.contains(tag.name)) {
           tag.type = HtmlTag.TagType.Empty
           var node = HtmlNode(tag)
           current.appendChild(node)
@@ -171,6 +172,12 @@ class HtmlParser {
         depth.pop()
         current = depth.get(depth.size - 1)
 //        rootNode.appendChild(node)
+      } else if (tag.type == HtmlTag.TagType.Empty) {
+        var emptyTag = HtmlNode()
+        emptyTag.type = HtmlNode.NodeType.TagNode
+        emptyTag.name = tag.name!!
+        emptyTag.attr = tag.attr!!
+        current.appendChild(emptyTag)
       } else if (tag.type == HtmlTag.TagType.Text) {
         var textNode = HtmlNode.createTextNode(tag.name!!)
         textNode.innerId = tag.innerId
