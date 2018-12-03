@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: debian:stretch
+    steps:
+    - checkout
+    - run:
+        name: update apt
+        command: apt update -y
+    - run:
+        name: check
+        command: ./gradlew test
