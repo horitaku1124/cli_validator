@@ -21,27 +21,31 @@ fun main(args: Array<String>) {
       val filePath = child.absoluteFile.toPath().toString()
       if (filePath.endsWith(".properties")) {
         val result = propertyFileCanOpen2(filePath)
-        if (!result) {
+        if (!result.first) {
           succeed = false
         }
-        println(filePath + " " + (if (result) "OK" else "NG"))
+        println(filePath + " " + (if (result.first) "OK" else "NG"))
       }
     }
     System.exit(if (succeed) 0 else 1)
   } else if (parentDir.isFile) {
     val result = propertyFileCanOpen2(parentDir.absolutePath)
-    println(parentDir.absolutePath + " " + (if (result) "OK" else "NG"))
-    System.exit(if (result) 0 else 1)
+    println(parentDir.absolutePath + " " + (if (result.first) "OK" else "NG"))
+    for (error in result.second) {
+      System.err.println(error)
+    }
+    System.exit(if (result.first) 0 else 1)
   } else {
     System.err.println("It is not directory")
     System.exit(3)
   }
 }
 
-fun propertyFileCanOpen2(filePath: String): Boolean {
+fun propertyFileCanOpen2(filePath: String): Pair<Boolean, List<String>> {
   val propMatch = Regex("""^([a-zA-Z0-9\\.]*) *= *(.*)""")
   var result = true
   val kvs = HashMap<String, String>()
+  val errorList = ArrayList<String>()
   try {
     val file = FileInputStream(filePath)
     val br = file.bufferedReader()
@@ -58,19 +62,19 @@ fun propertyFileCanOpen2(filePath: String): Boolean {
         val value = match.groupValues.get(2)
 
         if (key.isEmpty()) {
-          System.err.println("line ${index} key is empty")
+          errorList.add("line ${index} key is empty")
           result = false
         } else if (kvs.containsKey(key)) {
-          System.err.println("line ${index} key is duplicated => ${key}")
+          errorList.add("line ${index} key is duplicated => ${key}")
           result = false
         } else {
           kvs.put(key, value)
         }
       }
     }
-    return result
+    return Pair(result, errorList)
   } catch (e: Exception) {
     e.printStackTrace()
-    return false
+    return Pair(false, errorList)
   }
 }
