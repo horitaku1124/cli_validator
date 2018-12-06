@@ -39,7 +39,7 @@ fun main(args: Array<String>) {
 }
 
 fun propertyFileCanOpen2(filePath: String): Boolean {
-  val propMatch = Regex("""^([a-zA-Z0-9\\.]*)=(\S*)""")
+  val propMatch = Regex("""^([a-zA-Z0-9\\.]*) *= *(.*)""")
   var result = true
   val kvs = HashMap<String, String>()
   try {
