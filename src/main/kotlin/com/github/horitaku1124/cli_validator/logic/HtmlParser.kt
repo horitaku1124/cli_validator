@@ -4,7 +4,6 @@ import com.github.horitaku1124.cli_validator.model.HtmlNode
 import com.github.horitaku1124.cli_validator.model.HtmlTag
 import java.util.*
 
-
 class HtmlParser {
   var EmptyTags = listOf("meta", "link", "img")
   fun removeScriptTag(html: String): String {
@@ -12,16 +11,16 @@ class HtmlParser {
     val rightMath = "</script>"
     var retHtml = html
     while (true) {
-      var index = retHtml.indexOf(leftMath)
+      val index = retHtml.indexOf(leftMath)
       if (index < 0) {
         break
       }
-      var indexEnd = retHtml.indexOf(rightMath)
+      val indexEnd = retHtml.indexOf(rightMath)
       if (indexEnd < 0) {
         break
       }
-      var left = retHtml.substring(0, index)
-      var right = retHtml.substring(indexEnd + rightMath.length, retHtml.length)
+      val left = retHtml.substring(0, index)
+      val right = retHtml.substring(indexEnd + rightMath.length, retHtml.length)
       retHtml = left + right
     }
     return retHtml
@@ -32,9 +31,9 @@ class HtmlParser {
     var inTag = false
     var inComment = false
     var insideTag = StringBuffer()
-    var htmlList = arrayListOf<HtmlTag>()
+    val htmlList = arrayListOf<HtmlTag>()
     while (i < html.length) {
-      var c = html[i]
+      val c = html[i]
       if (inComment) {
         if (c == '-') {
           if (html[i + 1] == '-' && html[i + 2] == '>') {
@@ -66,7 +65,7 @@ class HtmlParser {
       } else {
         if (c == '<') {
           if (insideTag.isNotEmpty()) {
-            var newTag = HtmlTag(HtmlTag.TagType.Text, insideTag.toString())
+            val newTag = HtmlTag(HtmlTag.TagType.Text, insideTag.toString())
             newTag.innerId = htmlList.size + 1
             htmlList.add(newTag)
           }
@@ -89,12 +88,12 @@ class HtmlParser {
 
   fun parseAttr(tagStr: String, tagType: HtmlTag.TagType = HtmlTag.TagType.Open): HtmlTag {
     var strBuf = StringBuffer()
-    var tokens = arrayListOf<String>()
+    val tokens = arrayListOf<String>()
     var inSingleQuote = false
     var inDoubleQuote = false
     var i = 0
     while (i < tagStr.length) {
-      var c = tagStr[i]
+      val c = tagStr[i]
       if (inSingleQuote) {
         if (c == '\'') {
           inSingleQuote = false
@@ -139,9 +138,9 @@ class HtmlParser {
       tokens.add(strBuf.toString())
     }
 
-    var attributes = HashMap<String, String>()
+    val attributes = HashMap<String, String>()
     for (j in 1 until tokens.size) {
-      var pair = tokens[j].split("=")
+      val pair = tokens[j].split("=")
       if (pair.size > 1) {
         attributes.put(pair[0], pair[1])
       }
@@ -150,9 +149,9 @@ class HtmlParser {
   }
 
   fun extractTree(htmlList: ArrayList<HtmlTag>): HtmlNode {
-    var rootNode = HtmlNode("root", HtmlNode.NodeType.Root)
+    val rootNode = HtmlNode("root", HtmlNode.NodeType.Root)
 
-    var depth = Stack<HtmlNode>()
+    val depth = Stack<HtmlNode>()
     depth.push(rootNode)
 
     var current = rootNode
@@ -160,10 +159,10 @@ class HtmlParser {
       if (tag.type == HtmlTag.TagType.Open) {
         if (EmptyTags.contains(tag.name)) {
           tag.type = HtmlTag.TagType.Empty
-          var node = HtmlNode(tag)
+          val node = HtmlNode(tag)
           current.appendChild(node)
         } else {
-          var node = HtmlNode(tag)
+          val node = HtmlNode(tag)
           current.appendChild(node)
           depth.push(node)
           current = node
@@ -173,13 +172,13 @@ class HtmlParser {
         current = depth.get(depth.size - 1)
 //        rootNode.appendChild(node)
       } else if (tag.type == HtmlTag.TagType.Empty) {
-        var emptyTag = HtmlNode()
+        val emptyTag = HtmlNode()
         emptyTag.type = HtmlNode.NodeType.TagNode
         emptyTag.name = tag.name!!
         emptyTag.attr = tag.attr!!
         current.appendChild(emptyTag)
       } else if (tag.type == HtmlTag.TagType.Text) {
-        var textNode = HtmlNode.createTextNode(tag.name!!)
+        val textNode = HtmlNode.createTextNode(tag.name!!)
         textNode.innerId = tag.innerId
         current.appendChild(textNode)
       }
@@ -198,7 +197,7 @@ class HtmlParser {
   }
 
   fun allTextFromTree(nodeTree: HtmlNode): String {
-    var buffer = StringBuffer()
+    val buffer = StringBuffer()
     dig(nodeTree, buffer)
     return buffer.toString()
   }

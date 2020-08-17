@@ -46,7 +46,7 @@ var obsoleteAttributes: Map<String, List<String>> = hashMapOf(
 
 fun searchDirectory(parentDir:File, found:ArrayList<File>) {
   if (parentDir.isDirectory) {
-    var children = parentDir.listFiles()
+    val children = parentDir.listFiles()
     for (child in children) {
       searchDirectory(child, found)
     }
@@ -73,7 +73,7 @@ fun main(args: Array<String>) {
     if (htmlPath.endsWith(".html")) {
 
       try {
-        var html = File(htmlPath).readText()
+        val html = File(htmlPath).readText()
         message = htmlValidator.checkHtmlFile(html)
       } catch (e: Exception) {
         e.printStackTrace()
@@ -89,17 +89,17 @@ fun main(args: Array<String>) {
     }
     System.exit(if (result) 0 else 1)
   } else if (parentDir.isDirectory) {
-    var targetCanonicalPath = parentDir.canonicalPath
-    var htmlFiles = arrayListOf<File>()
+    val targetCanonicalPath = parentDir.canonicalPath
+    val htmlFiles = arrayListOf<File>()
     searchDirectory(parentDir, htmlFiles)
-    var succeed = true
+    val succeed = true
     for (child in htmlFiles) {
       val htmlPath = child.canonicalPath
       if (htmlPath.endsWith(".html")) {
         var result = true
         var message: Message? = null
         try {
-          var html = File(htmlPath).readText()
+          val html = File(htmlPath).readText()
           message = htmlValidator.checkHtmlFile(html)
         } catch (e: Exception) {
           e.printStackTrace()
@@ -125,17 +125,17 @@ fun main(args: Array<String>) {
 
 class HtmlValidator {
   fun checkHtmlFile(html: String): Message {
-    var resultMessage = Message()
-    var parser = HtmlParser()
-    var htmlList = parser.parseHtml(html)
+    val resultMessage = Message()
+    val parser = HtmlParser()
+    val htmlList = parser.parseHtml(html)
     for (tag in htmlList) {
       if (tag.type == HtmlTag.TagType.Open) {
-        var name = tag.name;
+        val name = tag.name;
         if (obsoleteTags.contains(name)) {
           resultMessage.warnList.add("Obsolete tag: $name")
         } else if (obsoleteAttributes.containsKey(name)) {
-          var attr = tag.attr
-          var candidates = obsoleteAttributes[name]
+          val attr = tag.attr
+          val candidates = obsoleteAttributes[name]
           if (attr != null && candidates != null) {
             for (set in attr.entries) {
               if (candidates.contains(set.key)) {

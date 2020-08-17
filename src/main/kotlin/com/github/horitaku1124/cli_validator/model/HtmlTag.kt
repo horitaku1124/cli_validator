@@ -8,7 +8,7 @@ class HtmlTag(var type: TagType, var name: String? = null, var attr: Map<String,
   var innerId: Int? = null
 
   override fun toString():String {
-    var str = name ?: ""
+    val str = name ?: ""
     var output = this.type.toString()
     output += "\t" + (str.replace("\n", "\\n"))
     if (attr != null && attr!!.isNotEmpty()) {
