@@ -3,6 +3,7 @@ package com.github.horitaku1124.cli_validator
 import com.github.horitaku1124.cli_validator.logic.HtmlParser
 import com.github.horitaku1124.cli_validator.model.HtmlTag
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.not
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -42,16 +43,33 @@ This is main content
 <p><img src="2.jpg" ></p>
 </body>
 </html>"""
+  var html4 = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Test HTML4</title>
+<script>
+alert('abc');
+</script>
+<style>
+* {
+ margin:0;
+ padding:0;
+}
+</style>
+</head>
+<body>
+<p>This is HTML 4 document</p>
+</body>
+</html>"""
 
   var hv = HtmlParser()
   @Before
   fun setup() {
-    System.out.println(" -- setup --")
   }
 
   @Test
   fun parseHtml1() {
-    var htmlList = hv.parseHtml("<html></html>")
+    val htmlList = hv.parseHtml("<html></html>")
     assertThat(htmlList.size, Is(2))
     assertThat(htmlList[0].type, Is(HtmlTag.TagType.Open))
     assertThat(htmlList[0].name, Is("html"))
@@ -61,35 +79,46 @@ This is main content
 
   @Test
   fun parseHtml2() {
-    var htmlList = hv.parseHtml(html1)
+    val htmlList = hv.parseHtml(html1)
     assertThat(htmlList.size, Is(19))
   }
   @Test
   fun parseHtml3() {
-    var htmlList = hv.parseHtml(html1)
-    var nodeTree = hv.extractTree(htmlList)
-    var texts = hv.allTextFromTree(nodeTree)
+    val htmlList = hv.parseHtml(html1)
+    val nodeTree = hv.extractTree(htmlList)
+    val texts = hv.allTextFromTree(nodeTree)
     assertThat(texts, containsString("This is main content"))
   }
   @Test
   fun parseHtml4() {
-    var htmlList = hv.parseHtml(html2)
+    val htmlList = hv.parseHtml(html2)
     assertThat(htmlList.size, Is(20))
   }
 
   @Test
   fun parseHtml5() {
-    var htmlList = hv.parseHtml("<a class='c1 c2 ' href='/' \n  width='100' \n  height='200'>")
+    val htmlList = hv.parseHtml("<a class='c1 c2 ' href='/' \n  width='100' \n  height='200'>")
     assertThat(htmlList.size, Is(1))
   }
 
   @Test
   fun parseHtml6() {
-    var htmlList = hv.parseHtml(html3)
+    val htmlList = hv.parseHtml(html3)
     assertThat(htmlList.get(15).name, Is("img"))
     assertThat(htmlList.get(15).type, Is(HtmlTag.TagType.Empty))
     assertThat(htmlList.get(19).name, Is("img"))
     assertThat(htmlList.get(19).type, Is(HtmlTag.TagType.Open))
     assertThat(htmlList.size, Is(25))
+  }
+
+  @Test
+  fun parseHtml7() {
+    val html = hv.removeScriptTag(hv.removeStyleTag(html4))
+    val htmlList = hv.parseHtml(html)
+    val nodeTree = hv.extractTree(htmlList)
+    val text = hv.allTextFromTree(nodeTree)
+    assertThat(text, containsString("This is HTML 4 document"))
+    assertThat(text, not(containsString("alert('abc');")))
+    assertThat(text, not(containsString("margin:0;")))
   }
 }

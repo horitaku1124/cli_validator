@@ -26,6 +26,26 @@ class HtmlParser {
     return retHtml
   }
 
+  fun removeStyleTag(html: String): String {
+    val leftMath = "<style"
+    val rightMath = "</style>"
+    var retHtml = html
+    while (true) {
+      var index = retHtml.indexOf(leftMath)
+      if (index < 0) {
+        break
+      }
+      var indexEnd = retHtml.indexOf(rightMath)
+      if (indexEnd < 0) {
+        break
+      }
+      var left = retHtml.substring(0, index)
+      var right = retHtml.substring(indexEnd + rightMath.length, retHtml.length)
+      retHtml = left + right
+    }
+    return retHtml
+  }
+
   fun parseHtml(html: String): ArrayList<HtmlTag> {
     var i = 0;
     var inTag = false
