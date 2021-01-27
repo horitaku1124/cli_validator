@@ -106,6 +106,16 @@ class HtmlParser {
     return htmlList
   }
 
+  fun parseHtmlToTree(html: String): HtmlNode {
+    val list = parseHtml(html)
+    if (list[0].name == "!DOCTYPE") {
+      val list2 = list.subList(1, list.size)
+      return extractTree(list2)
+    } else {
+      return extractTree(list)
+    }
+  }
+
   fun parseAttr(tagStr: String, tagType: HtmlTag.TagType = HtmlTag.TagType.Open): HtmlTag {
     var strBuf = StringBuffer()
     val tokens = arrayListOf<String>()
@@ -168,7 +178,7 @@ class HtmlParser {
     return HtmlTag(tagType, tokens[0], attributes)
   }
 
-  fun extractTree(htmlList: ArrayList<HtmlTag>): HtmlNode {
+  fun extractTree(htmlList: List<HtmlTag>): HtmlNode {
     val rootNode = HtmlNode("root", HtmlNode.NodeType.Root)
 
     val depth = Stack<HtmlNode>()

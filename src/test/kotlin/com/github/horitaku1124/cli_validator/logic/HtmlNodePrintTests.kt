@@ -24,4 +24,20 @@ class HtmlNodePrintTests {
     println(text)
     assertThat(text, containsString("Test HTML1"))
   }
+  @Test
+  fun ppTest2() {
+    val parser = HtmlParser()
+    val trees = parser.parseHtmlToTree(html1)
+    val text = HtmlNodePrint.prettyPrint(trees)
+    println(text)
+    assertThat(text, containsString("Test HTML1"))
+  }
+  @Test
+  fun toHamlTest() {
+    val parser = HtmlParser()
+    val trees = parser.parseHtmlToTree(html1)
+    val haml = HtmlNodePrint.toHaml(trees)
+    println(haml)
+    assertThat(haml, containsString("Test HTML1"))
+  }
 }
