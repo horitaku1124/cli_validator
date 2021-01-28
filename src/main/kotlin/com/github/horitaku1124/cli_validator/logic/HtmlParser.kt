@@ -108,7 +108,7 @@ class HtmlParser {
 
   fun parseHtmlToTree(html: String): HtmlNode {
     val list = parseHtml(html)
-    if (list[0].name == "!DOCTYPE") {
+    if (list.size > 0 && list[0].name == "!DOCTYPE") {
       val list2 = list.subList(1, list.size)
       return extractTree(list2)
     } else {
