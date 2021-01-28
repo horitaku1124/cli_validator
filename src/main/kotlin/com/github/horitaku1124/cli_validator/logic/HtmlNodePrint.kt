@@ -53,6 +53,32 @@ object HtmlNodePrint {
       sb.append("  ".repeat(depth))
       sb.append("%")
       sb.append(child.name)
+
+      val attr = child.attr
+      if (attr.containsKey("id")) {
+        sb.append("#")
+        sb.append(attr["id"])
+      }
+      if (attr.containsKey("class")) {
+        sb.append(".")
+        sb.append(attr["class"])
+      }
+
+      val attrs = arrayListOf<Pair<String, String>>()
+      listOf("src", "href").forEach { key ->
+        if (attr.containsKey(key)) {
+          attrs.add(Pair(key, attr[key] ?: error("no key")))
+        }
+      }
+      if (attrs.isNotEmpty()) {
+        sb.append("{")
+        sb.append(attrs
+            .map { it.first + ": " + it.second }
+            .joinToString(","))
+
+        sb.append("}")
+      }
+
       sb.append("\n")
     }
     for (grandChild in child.children) {
