@@ -4,7 +4,7 @@ import com.github.horitaku1124.cli_validator.logic.HtmlParser
 import com.github.horitaku1124.cli_validator.model.HtmlTag
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.not
-import org.junit.Assert.assertThat
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.hamcrest.CoreMatchers.`is` as Is
