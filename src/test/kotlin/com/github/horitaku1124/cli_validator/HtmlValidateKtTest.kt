@@ -61,6 +61,16 @@ alert('abc');
 <p>This is HTML 4 document</p>
 </body>
 </html>"""
+  var html5 = """<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body>
+<p>LINE1
+<p>LINE2<br>and text
+<p>LINE3
+</body>
+</html>"""
 
   var hv = HtmlParser()
   @Before
@@ -120,5 +130,12 @@ alert('abc');
     assertThat(text, containsString("This is HTML 4 document"))
     assertThat(text, not(containsString("alert('abc');")))
     assertThat(text, not(containsString("margin:0;")))
+  }
+
+  @Test
+  fun parseHtml8() {
+    val htmlList = hv.parseHtml(html5)
+    val htmlList2 = hv.recoverGap(htmlList)
+    assertThat(23, Is(htmlList2.size))
   }
 }

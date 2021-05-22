@@ -5,7 +5,7 @@ import com.github.horitaku1124.cli_validator.model.HtmlTag
 import java.util.*
 
 class HtmlParser {
-  var EmptyTags = listOf("meta", "link", "img", "br")
+  var EmptyTags = listOf("meta", "link", "img", "br", "hr")
   fun removeScriptTag(html: String): String {
     val leftMath = "<script"
     val rightMath = "</script>"
@@ -230,5 +230,28 @@ class HtmlParser {
     val buffer = StringBuffer()
     dig(nodeTree, buffer)
     return buffer.toString()
+  }
+
+  fun recoverGap(tagList: List<HtmlTag>): List<HtmlTag> {
+    val returnArray = arrayListOf<HtmlTag>()
+    val checkToEnd = listOf("body", "div", "p", "dd", "dt")
+    val needToFill = listOf("p", "dd", "dt")
+    var check: String? = null
+    for (tag in tagList) {
+      if (check != null && tag.type == HtmlTag.TagType.Open && checkToEnd.contains(tag.name)) {
+        returnArray.add(HtmlTag(
+          type = HtmlTag.TagType.Close,
+          name = check
+        ))
+        check = null
+      }
+      if (check == null) {
+        if (tag.name in needToFill) {
+          check = tag.name
+        }
+      }
+      returnArray.add(tag)
+    }
+    return returnArray
   }
 }
