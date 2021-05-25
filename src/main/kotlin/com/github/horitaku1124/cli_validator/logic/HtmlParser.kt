@@ -199,8 +199,11 @@ class HtmlParser {
         }
       } else if (tag.type == HtmlTag.TagType.Close) {
         depth.pop()
-        current = depth.get(depth.size - 1)
-//        rootNode.appendChild(node)
+        if (depth.isNotEmpty()) {
+          current = depth.get(depth.size - 1)
+        } else {
+          current = rootNode
+        }
       } else if (tag.type == HtmlTag.TagType.Empty) {
         val emptyTag = HtmlNode()
         emptyTag.type = HtmlNode.NodeType.TagNode
@@ -212,7 +215,6 @@ class HtmlParser {
         textNode.innerId = tag.innerId
         current.appendChild(textNode)
       }
-
     }
     return rootNode
   }
@@ -238,17 +240,21 @@ class HtmlParser {
     val needToFill = listOf("p", "dd", "dt")
     var check: String? = null
     for (tag in tagList) {
-      if (check != null && tag.type == HtmlTag.TagType.Open && checkToEnd.contains(tag.name)) {
-        returnArray.add(HtmlTag(
-          type = HtmlTag.TagType.Close,
-          name = check
-        ))
-        check = null
+      if (check != null) {
+        if (tag.type == HtmlTag.TagType.Open && checkToEnd.contains(tag.name)) {
+          returnArray.add(HtmlTag(
+            type = HtmlTag.TagType.Close,
+            name = check
+          ))
+          check = null
+        }
       }
       if (check == null) {
         if (tag.name in needToFill) {
           check = tag.name
         }
+      } else if (tag.type == HtmlTag.TagType.Close && tag.name == check) {
+        check = null
       }
       returnArray.add(tag)
     }
