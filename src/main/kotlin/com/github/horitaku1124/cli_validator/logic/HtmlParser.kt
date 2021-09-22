@@ -5,7 +5,9 @@ import com.github.horitaku1124.cli_validator.model.HtmlTag
 import java.util.*
 
 class HtmlParser {
-  var EmptyTags = listOf("meta", "link", "img", "br", "hr")
+  companion object {
+    var EmptyTags = listOf("meta", "link", "img", "br", "hr")
+  }
   fun removeScriptTag(html: String): String {
     val leftMath = "<script"
     val rightMath = "</script>"
