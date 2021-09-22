@@ -1,6 +1,8 @@
 package com.github.horitaku1124.cli_validator.model
 
-class HtmlNode() {
+import java.util.*
+
+open class HtmlNode() {
   lateinit var name: String
   lateinit var type: NodeType
   var attr = mapOf<String, String>()
@@ -34,6 +36,38 @@ class HtmlNode() {
       val textNode = HtmlNode(NodeType.Text)
       textNode.innerText = text
       return textNode
+    }
+  }
+
+  fun findElementByTagName(tagName: String): Optional<HtmlNode> {
+    val found = digForTagName(tagName, this)
+    return if (found == null) Optional.empty() else Optional.of(found)
+  }
+
+  private fun digForTagName(tagName: String, node:HtmlNode): HtmlNode? {
+    if (node.type == NodeType.TagNode && node.name == tagName) {
+      return node
+    }
+    for (child in node.children) {
+      val found = digForTagName(tagName, child)
+      if (found != null) {
+        return found
+      }
+    }
+    return null
+  }
+
+  override fun toString(): String {
+    return when (type) {
+      NodeType.TagNode -> {
+        "<$name>"
+      }
+      NodeType.Text -> {
+        "\"" + innerText + "\""
+      }
+      else -> {
+        "//"
+      }
     }
   }
 }
