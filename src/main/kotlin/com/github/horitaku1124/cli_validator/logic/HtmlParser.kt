@@ -31,16 +31,16 @@ class HtmlParser {
     val rightMath = "</style>"
     var retHtml = html
     while (true) {
-      var index = retHtml.indexOf(leftMath)
+      val index = retHtml.indexOf(leftMath)
       if (index < 0) {
         break
       }
-      var indexEnd = retHtml.indexOf(rightMath)
+      val indexEnd = retHtml.indexOf(rightMath)
       if (indexEnd < 0) {
         break
       }
-      var left = retHtml.substring(0, index)
-      var right = retHtml.substring(indexEnd + rightMath.length, retHtml.length)
+      val left = retHtml.substring(0, index)
+      val right = retHtml.substring(indexEnd + rightMath.length, retHtml.length)
       retHtml = left + right
     }
     return retHtml
@@ -108,11 +108,11 @@ class HtmlParser {
 
   fun parseHtmlToTree(html: String): HtmlNode {
     val list = parseHtml(html)
-    if (list.size > 0 && list[0].name == "!DOCTYPE") {
+    return if (list.size > 0 && list[0].name == "!DOCTYPE") {
       val list2 = list.subList(1, list.size)
-      return extractTree(list2)
+      extractTree(list2)
     } else {
-      return extractTree(list)
+      extractTree(list)
     }
   }
 
@@ -199,10 +199,10 @@ class HtmlParser {
         }
       } else if (tag.type == HtmlTag.TagType.Close) {
         depth.pop()
-        if (depth.isNotEmpty()) {
-          current = depth.get(depth.size - 1)
+        current = if (depth.isNotEmpty()) {
+          depth[depth.size - 1]
         } else {
-          current = rootNode
+          rootNode
         }
       } else if (tag.type == HtmlTag.TagType.Empty) {
         val emptyTag = HtmlNode()
