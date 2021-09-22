@@ -5,6 +5,7 @@ import com.github.horitaku1124.cli_validator.model.HtmlTag
 import com.github.horitaku1124.cli_validator.model.Message
 import java.io.File
 import java.util.*
+import kotlin.system.exitProcess
 
 var obsoleteTags = listOf(
         "acronym", "applet", "basefont", "big", "center", "dir", "font", "frame", "frameset",
@@ -58,7 +59,7 @@ fun searchDirectory(parentDir:File, found:ArrayList<File>) {
 fun main(args: Array<String>) {
   if (args.isEmpty()) {
     System.err.println("No html path")
-    System.exit(1);
+    exitProcess(1)
   }
   val htmlValidator = HtmlValidator()
   val path = args[0]
@@ -116,10 +117,10 @@ fun main(args: Array<String>) {
         }
       }
     }
-    System.exit(if (succeed) 0 else 1)
+    exitProcess(if (succeed) 0 else 1)
   } else {
     System.err.println("It is not directory")
-    System.exit(3)
+    exitProcess(3)
   }
 }
 
