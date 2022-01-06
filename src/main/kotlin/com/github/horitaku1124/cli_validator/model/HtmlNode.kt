@@ -11,7 +11,7 @@ open class HtmlNode() {
   var innerId: Int? = null
 
   enum class NodeType {
-    TagNode, Text, Root
+    TagNode, Text, Root, Empty
   }
   constructor(type: NodeType) : this() {
     this.type = type
@@ -23,7 +23,7 @@ open class HtmlNode() {
 
   constructor(tag: HtmlTag) : this() {
     name = tag.name!!
-    type = NodeType.TagNode
+    type = if (tag.type == HtmlTag.TagType.Empty) NodeType.Empty else NodeType.TagNode
     innerId = tag.innerId
     attr = tag.attr!!
   }
