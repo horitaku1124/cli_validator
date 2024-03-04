@@ -65,6 +65,9 @@ open class HtmlNode() {
       NodeType.Text -> {
         "\"" + innerText + "\""
       }
+      NodeType.Empty -> {
+        "<$name/>"
+      }
       else -> {
         "//"
       }

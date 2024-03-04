@@ -48,7 +48,7 @@ var obsoleteAttributes: Map<String, List<String>> = hashMapOf(
 fun searchDirectory(parentDir:File, found:ArrayList<File>) {
   if (parentDir.isDirectory) {
     val children = parentDir.listFiles()
-    for (child in children) {
+    for (child in children!!) {
       searchDirectory(child, found)
     }
   } else {
@@ -66,7 +66,7 @@ fun main(args: Array<String>) {
   val parentDir = File(path)
   if (!parentDir.exists()) {
     System.err.println("Parent directory doesn't exists")
-    System.exit(2)
+    exitProcess(2)
   } else if (parentDir.isFile) {
     var result = true;
     var message: Message? = null

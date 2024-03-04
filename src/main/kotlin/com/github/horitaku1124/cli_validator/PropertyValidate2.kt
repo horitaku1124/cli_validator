@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
   } else if (parentDir.isDirectory) {
     val files = parentDir.listFiles()
     var succeed = true
-    for (child in files) {
+    for (child in files!!) {
       val filePath = child.absoluteFile.toPath().toString()
       if (filePath.endsWith(".properties")) {
         val result = propertyFileCanOpen2(filePath)
