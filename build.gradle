@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.6.21'
+    ext.kotlin_version = '1.9.22'
 
     repositories {
         mavenCentral()
@@ -8,6 +8,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
+
 
 group 'com.github.horitaku1124'
 version '1.0-SNAPSHOT'
@@ -23,18 +24,18 @@ configurations {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    testCompile "junit:junit:4.13.2"
-    testCompile "org.mockito:mockito-core:4.9.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "org.mockito:mockito-core:4.9.0"
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = 11
+    kotlinOptions.jvmTarget = 21
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = 11
+    kotlinOptions.jvmTarget = 21
 }
 jar {
-    manifest {}
-    from { configurations.myConfig.collect { it.isDirectory() ? it : zipTree(it) } }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 }
