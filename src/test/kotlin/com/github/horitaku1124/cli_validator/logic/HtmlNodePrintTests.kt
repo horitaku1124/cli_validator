@@ -13,6 +13,7 @@ class HtmlNodePrintTests {
 <body>
 <p><img src="1.jpg" /></p>
 <p><img src="2.jpg" ></p>
+<p>This is text</p>
 </body>
 </html>"""
   @Test
@@ -39,5 +40,14 @@ class HtmlNodePrintTests {
     val haml = HtmlNodePrint.toHaml(trees)
     println(haml)
     assertThat(haml, containsString("Test HTML1"))
+  }
+  @Test
+  fun searchTest() {
+    val parser = HtmlParser()
+    val trees = parser.parseHtmlToTree(html1)
+    val body = HtmlSearch.findByName(trees, "body")!!
+    val text = HtmlNodePrint.prettyPrint(body)
+    println(text)
+    assertThat(text, containsString("This is text"))
   }
 }

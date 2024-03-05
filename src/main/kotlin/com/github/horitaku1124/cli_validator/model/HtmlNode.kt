@@ -73,4 +73,11 @@ open class HtmlNode() {
       }
     }
   }
+
+  fun isNameOf(checkName: String): Boolean {
+    if (type == NodeType.TagNode || type == NodeType.Empty) {
+      return name == checkName
+    }
+    return false
+  }
 }
