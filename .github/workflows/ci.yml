@@ -14,3 +14,7 @@ jobs:
           java-version: 21
       - name: Build with Gradle
         run: ./gradlew build
+      - name: Property file check Test
+        run: java -cp build/libs/*.jar com.github.horitaku1124.cli_validator.PropertyValidate2Kt src/main/resource/test1.properties
+      - name: HTML file check Test
+        run: java -cp build/libs/*.jar com.github.horitaku1124.cli_validator.HtmlValidateKt src/main/resource/test1.html
