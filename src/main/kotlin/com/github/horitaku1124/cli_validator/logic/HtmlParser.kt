@@ -2,6 +2,8 @@ package com.github.horitaku1124.cli_validator.logic
 
 import com.github.horitaku1124.cli_validator.model.HtmlNode
 import com.github.horitaku1124.cli_validator.model.HtmlTag
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.*
 
 class HtmlParser {
@@ -261,5 +263,17 @@ class HtmlParser {
       returnArray.add(tag)
     }
     return returnArray
+  }
+
+
+  fun parseFileToNode(path: Path): HtmlNode {
+    val htmlOrg = Files.readString(path)
+
+    val parser = HtmlParser()
+    val html = parser.removeScriptTag(parser.removeStyleTag(htmlOrg))
+
+    val htmlList = parser.parseHtml(html)
+    val nodeTree = parser.extractTree(htmlList)
+    return nodeTree
   }
 }
